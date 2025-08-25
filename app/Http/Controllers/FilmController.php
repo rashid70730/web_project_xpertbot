@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Film;
+use App\Http\Requests\StoreFilmRequest;
 
 class FilmController extends Controller
 {
@@ -32,7 +33,7 @@ class FilmController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    /*public function store(Request $request)
     {
         $request->validate([
 
@@ -65,7 +66,17 @@ class FilmController extends Controller
             'message' => 'Film created successfully',
             'data' => $film,
         ], 201);
-    }
+    }*/
+
+    public function store(StoreFilmRequest $request)
+{
+    $film = Film::create(array_merge(
+        $request->validated(),
+        ['user_id' => auth()->id()]
+    ));
+
+    return response()->json(['data' => $film], 201);
+}
 
     /**
      * Display the specified resource.
