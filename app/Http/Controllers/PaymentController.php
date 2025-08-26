@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Payment; // Assuming you have a Payment model
+use App\Models\Payment; 
+use Stripe\Stripe;
+use Stripe\Charge;
 
 class PaymentController extends Controller
 {
@@ -26,6 +28,28 @@ class PaymentController extends Controller
     {
         //
     }
+
+   
+
+    public function pay(Request $request)
+    {
+    Stripe::setApiKey(env('STRIPE_SECRET'));
+
+    $charge = Charge::create([
+        'amount' => 50,
+        'currency' => 'usd',
+        'source' => $request->stripeToken,
+        'description' => 'Film festival ticket',
+    ]);
+
+    return response()->json($charge);
+    }
+
+
+
+
+
+
 
     /**
      * Store a newly created resource in storage.

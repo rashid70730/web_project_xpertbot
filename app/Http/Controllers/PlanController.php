@@ -42,7 +42,7 @@ class PlanController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'billing_cycle' => 'required|string|in:monthly,yearly',
-            'features' => 'nullable|string', // expecting an array
+            'features' => 'nullable|string', 
             'trial_period_days' => 'required|integer|min:0',
             'is_active' => 'sometimes|boolean',
         ]);

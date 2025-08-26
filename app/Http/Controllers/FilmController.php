@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Film;
 use App\Http\Requests\StoreFilmRequest;
+use App\Notifications\FilmApprovedNotification;
+
 
 class FilmController extends Controller
 {
@@ -163,5 +165,28 @@ class FilmController extends Controller
             ], 200);    
     }
         
+    }
+
+
+    public function accepte (Film $film)
+    {
+        // Only allow approving if film is pending
+        if ($film->status === 'pending') {
+            $film->status = 'accepted';
+            $film->save();
+
+            // Notify the owner
+            $film->user->notify(new FilmApprovedNotification($film));
+
+            return response()->json([
+                'message' => 'Film accepted successfully',
+                'film' => $film
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Film cannot be accepted. Current status: ' . $film->status,
+            'film' => $film
+        ], 400);
     }
 }

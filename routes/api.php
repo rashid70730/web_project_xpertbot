@@ -95,6 +95,11 @@ Route::get('/views/festival/{festivalId}', [ViewController::class, 'getViewsByFe
 Route::get('/views/plan/{planId}', [ViewController::class, 'getViewsByPlanId']);//  
 
 
+Route::post('/pay',[PaymentController::Class,'pay']);
+
+Route::post('/films/{film}/accepte', [FilmController::class, 'accepte']);
+
+
 
 
 
