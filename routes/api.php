@@ -97,7 +97,7 @@ Route::get('/views/plan/{planId}', [ViewController::class, 'getViewsByPlanId']);
 
 Route::post('/pay',[PaymentController::Class,'pay']);
 
-Route::post('/films/{film}/accepte', [FilmController::class, 'accepte']);
+Route::post('/films/{film}/accepted', [FilmController::class, 'accepted']);
 
 
 

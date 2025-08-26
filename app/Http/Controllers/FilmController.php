@@ -168,7 +168,7 @@ class FilmController extends Controller
     }
 
 
-    public function accepte (Film $film)
+    public function accepted (Film $film)
     {
         // Only allow approving if film is pending
         if ($film->status === 'pending') {
