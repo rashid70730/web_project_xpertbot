@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->enum('type', ['feature', 'short', 'reel']);
             $table->enum('distribution_phase', ['festival', 'public', 'library']);
-            $table->string('status')->default('pending'); // e.g., pending, accepted, rejected
+            $table->string('status')->default('pending'); 
             $table->string('video_url');
             $table->string('thumbnail_url')->nullable();
             $table->timestamps();

@@ -22,7 +22,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'role' => $request->role, // Assuming role is part of the registration data
+            'role' => $request->role, 
             
         ]);
         $user->save();

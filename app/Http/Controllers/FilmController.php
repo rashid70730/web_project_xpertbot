@@ -112,36 +112,36 @@ class FilmController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'type' => 'sometimes|required|string|max:255',
-            'distribution_phase' => 'sometimes|required|string|max:255',
-            'status' => 'sometimes|required|string|max:255',
-            'video_url' => 'sometimes|required|url',
-            'thumbnail_url' => 'sometimes|url',
-        ]);
-        //find the festival by id
-        $film = Film::find($id);
-        //if not found,return a message 
-        if (!$film) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Film not found',
-            ], 404);
-        }
-        //update the film with the request data
-        $film->update($request->all());
+    // public function update(Request $request, string $id)
+    // {
+    //     $request->validate([
+    //         'title' => 'sometimes|required|string|max:255',
+    //         'description' => 'sometimes|required|string',
+    //         'type' => 'sometimes|required|string|max:255',
+    //         'distribution_phase' => 'sometimes|required|string|max:255',
+    //         'status' => 'sometimes|required|string|max:255',
+    //         'video_url' => 'sometimes|required|url',
+    //         'thumbnail_url' => 'sometimes|url',
+    //     ]);
+    //     //find the festival by id
+    //     $film = Film::find($id);
+    //     //if not found,return a message 
+    //     if (!$film) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Film not found',
+    //         ], 404);
+    //     }
+    //     //update the film with the request data
+    //     $film->update($request->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Film updated successfully',
-            'data' => $film,
-        ]);
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Film updated successfully',
+    //         'data' => $film,
+    //     ]);
         
-    }
+    // }
 
     /**
      * Remove the specified resource from storage.
@@ -189,4 +189,33 @@ class FilmController extends Controller
             'film' => $film
         ], 400);
     }
+
+
+
+    // Update a film
+    public function update(Request $request, Film $film)
+    {
+        // Authorize using the policy
+        $this->authorize('update', $film);
+
+        // Validation
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            // other fields
+        ]);
+
+        // Update the film
+        $film->update($request->all());
+
+        return response()->json([
+            'message' => 'Film updated successfully',
+            'film' => $film
+        ]);
+    }
+
+
+
+
+
 }
