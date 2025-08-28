@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Festival;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -40,35 +40,38 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         
-        // Validate the request data
+    
+        // 1. Validate request
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string',
-           
+            'password' => 'required|string|min:6',
         ]);
-        
-    
-        // Attempt to authenticate the user
-        if(!\Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+
+        // 2. Find user by email
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
             return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials',
+                'message' => 'Email not found.'
+            ], 404);
+        }
+
+        // 3. Check password
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Incorrect password.'
             ], 401);
         }
-        // Get the authenticated user
-        $user = \Auth::user();
 
+        $token = $user->createToken('auth_token', [$user->role])->plainTextToken;
 
-        
-    
-        $token = $user->createToken('auth_token')->plainTextToken;
-    
+        // 5. Return response
         return response()->json([
-            'success' => true,
-            'message' => 'User logged in successfully',
-            'user' => $user,
-            'token' => $token,
-        ]);
+            'message' => 'Login successful',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user
+        ], 200);
     }
 
     public function logout(Request $request)
@@ -93,47 +96,6 @@ class AuthController extends Controller
 
     }
 
-    // FestivalFilmController.php
 
-public function store(Request $request)
-{
-    $request->validate([
-        'festival_id' => 'required|exists:festivals,id',
-        'film_id' => 'required|exists:films,id',
-        'status' => 'required|string|max:255', 
-        'decision_date' => 'required|date', 
-        'comments' => 'nullable|string|max:500', 
-
-        // add more if you have additional fields like 'status'
-    ]);
-
-    try {
-        $festival = Festival::findOrFail($request->festival_id);
-        $festival->films()->attach($request->film_id, [
-            'status' => $request->status,
-            'decision_date' => $request->decision_date,
-            'comments' => $request->comments,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Film assigned to festival successfully',
-            'data' => [
-                'festival_id' => $festival->id,
-                'film_id' => $request->film_id,
-                'status' => $request->status,
-                'decision_date' => $request->decision_date,
-                'comments' => $request->comments,
-            ]
-        ])->setStatusCode(201
-        );
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to assign film to festival.',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
 }
 

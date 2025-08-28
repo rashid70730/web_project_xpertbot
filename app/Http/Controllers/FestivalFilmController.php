@@ -30,20 +30,44 @@ class FestivalFilmController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'festival_id' => 'required|exists:festivals,id',
             'film_id' => 'required|exists:films,id',
-            'status' => 'required|in:pending,accepted,rejected',
-            'decision_date' => 'nullable|date',
-            'comments' => 'nullable|string|max:500',
+            'status' => 'required|string|max:255', 
+            'decision_date' => 'required|date', 
+            'comments' => 'nullable|string|max:500', 
+    
+            // add more if you have additional fields like 'status'
         ]);
-
-        $festivalfilm = FestivalFilm::create($validated);
-
-        return response()->json($festivalfilm, 201);
-        
+    
+        try {
+            $festival = Festival::findOrFail($request->festival_id);
+            $festival->films()->attach($request->film_id, [
+                'status' => $request->status,
+                'decision_date' => $request->decision_date,
+                'comments' => $request->comments,
+            ]);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Film assigned to festival successfully',
+                'data' => [
+                    'festival_id' => $festival->id,
+                    'film_id' => $request->film_id,
+                    'status' => $request->status,
+                    'decision_date' => $request->decision_date,
+                    'comments' => $request->comments,
+                ]
+            ])->setStatusCode(201
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to assign film to festival.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-
     /**
      * Display the specified resource.
      */
