@@ -143,3 +143,7 @@ Route::middleware('role:admin,festival organizer')->group(function () {
 });
 
 Route::get('/festivals', [FestivalController::class, 'index']); // All roles
+
+
+
+Route::post('/checkout', [PaymentController::class, 'checkout']); 

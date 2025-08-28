@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Payment; 
-use Stripe\Stripe;
 use Stripe\Charge;
+use App\Services\PaymentService;
+
+
 
 class PaymentController extends Controller
 {
@@ -31,19 +33,30 @@ class PaymentController extends Controller
 
    
 
-    public function pay(Request $request)
-    {
-    Stripe::setApiKey(env('STRIPE_SECRET'));
+    // public function pay(Request $request)
+    // {
+    // Stripe::setApiKey(env('STRIPE_SECRET'));
 
-    $charge = Charge::create([
-        'amount' => 50,
-        'currency' => 'usd',
-        'source' => $request->stripeToken,
-        'description' => 'Film festival ticket',
-    ]);
+    // $charge = Charge::create([
+    //     'amount' => 50,
+    //     'currency' => 'usd',
+    //     'source' => $request->stripeToken,
+    //     'description' => 'Film festival ticket',
+    // ]);
 
-    return response()->json($charge);
-    }
+    // return response()->json($charge);
+    // }
+
+
+    public function checkout(Request $request, PaymentService $paymentService)
+{
+    $session = $paymentService->createCheckoutSession($request->amount);
+    return response()->json(['id' => $session->id]);
+}
+
+
+
+
 
 
 
