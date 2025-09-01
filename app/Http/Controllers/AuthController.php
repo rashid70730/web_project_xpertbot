@@ -31,7 +31,12 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User registered successfully',
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
             'token' => $token,
             
         ]);
@@ -63,6 +68,7 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // 4. each token to carry its role
         $token = $user->createToken('auth_token', [$user->role])->plainTextToken;
 
         // 5. Return response
@@ -70,7 +76,12 @@ class AuthController extends Controller
             'message' => 'Login successful',
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
         ], 200);
     }
 

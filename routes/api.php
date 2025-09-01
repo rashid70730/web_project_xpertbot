@@ -61,15 +61,15 @@ Route::get('/subscriptions/{id}', [SubscriptionController::class, 'show']);
 // Route::get('/subscriptions/active', [SubscriptionController::class, 'getActiveSubscriptions']);
 
 
-// Route::post('/payments', [PaymentController::class, 'store']);
+//Route::post('/checkout', [PaymentController::class, 'checkout']); 
 
 
-
+Route::post('/payments', [PaymentController::class, 'store']);
 Route::get('/payments', [PaymentController::class, 'index']);
 Route::get('/payments/{id}', [PaymentController::class, 'show']);
-// Route::put('/payments/{id}', [PaymentController::class, 'update']);
-// Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
-// Route::get('/payments/user/{userId}', [PaymentController::class, 'getUserPayments']);
+Route::put('/payments/{id}', [PaymentController::class, 'update']);
+Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
+Route::get('/payments/user/{userId}', [PaymentController::class, 'getUserPayments']);
 
 
 Route::post('/festival-users', [FestivalUserController::class, 'store']);
@@ -88,6 +88,7 @@ Route::post('/views', [ViewController::class, 'store']);//done
 Route::get('/views/user/{userId}', [ViewController::class, 'getViewsByUserId']);//done
 Route::get('/views/film/{filmId}', [ViewController::class, 'getViewsByFilmId']);//done
 Route::get('/views/festival/{festivalId}', [ViewController::class, 'getViewsByFestivalId']);//done
+
 Route::get('/views/plan/{planId}', [ViewController::class, 'getViewsByPlanId']);
 
 
@@ -105,7 +106,9 @@ Route::get('/views/plan/{planId}', [ViewController::class, 'getViewsByPlanId']);
 Route::middleware(['auth:sanctum', RoleMiddleware::class . ':admin,filmmaker'])->group(function () {
     Route::post('/films', [FilmController::class, 'store']);
     Route::put('/films/{film}', [FilmController::class, 'update']);
-    Route::delete('/films/{film}', [FilmController::class, 'destroy']);
+    Route::delete('/films/{id}', [FilmController::class, 'destroy']);
+    Route::post('/films/{id}/restore', [FilmController::class, 'restore']);
+    Route::delete('/films/{id}/force', [FilmController::class, 'forceDelete']);
 });
 
 
@@ -122,10 +125,11 @@ Route::middleware(['auth:sanctum', RoleMiddleware::class . ':admin,festival orga
     ->group(function () {
         Route::post('/', [FestivalController::class, 'store']);       // create new festival
         Route::put('/{festival}', [FestivalController::class, 'update']); // update festival
-        Route::delete('/{festival}', [FestivalController::class, 'destroy']); // delete festival
+        Route::delete('/{id}', [FestivalController::class, 'destroy']);
+        Route::post('/{id}/restore', [FestivalController::class, 'restore']);
+        Route::delete('/{id}/force', [FestivalController::class, 'forceDelete']);
     });
 
-Route::post('/checkout', [PaymentController::class, 'checkout']); 
 
 
 

@@ -48,50 +48,58 @@ class PaymentController extends Controller
     // }
 
 
-    public function checkout(Request $request, PaymentService $paymentService)
-{
-    $session = $paymentService->createCheckoutSession($request->amount);
-    return response()->json(['id' => $session->id]);
-}
-
-
-
-
-
-
-
-
-
-
+    public function createCheckoutSession(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|integer|min:1|max:100000',
+            'currency' => 'required|string|in:usd,eur,aud',
+        ]);
+    
+        $session = Session::create([
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => $request->currency,
+                    'unit_amount' => $request->amount,
+                    'product_data' => [
+                        'name' => 'Film Purchase',
+                    ],
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => url('/success'),
+            'cancel_url' => url('/cancel'),
+        ]);
+    
+        return response()->json($session);
+    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'film_id' => 'required|exists:films,id',
-            'type' => 'required|string',
-            'amount' => 'required|numeric|min:0',
-            
-            
-        ]);
+{
+    $validated = $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'film_id' => 'required|exists:films,id',
+        'type'    => 'required|string|in:subscription,pay-per-view,donation',
+        'amount'  => 'required|numeric|min:1|max:10000',
+    ]);
 
-        $payment = Payment::create([
-            'user_id' => $request->user_id,
-            'film_id' => $request->film_id,
-            'type' => $request->type,
-            'amount' => $request->amount,
-            
-        ]);
+    $payment = Payment::create([
+        'user_id' => $validated['user_id'],
+        'film_id' => $validated['film_id'],
+        'type'    => $validated['type'],
+        'amount'  => $validated['amount'],
+    ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Payment created successfully',
-            'data' => $payment
-        ], 201);
-    }
+    return response()->json([
+        'success' => true,
+        'message' => 'Payment created successfully',
+        'data'    => $payment
+    ], 201);
+}
+
 
     /**
      * Display the specified resource.

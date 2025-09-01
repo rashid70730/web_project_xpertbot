@@ -143,29 +143,72 @@ class FilmController extends Controller
         
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //find the film by id
-        $film = Film::find($id);
-        if (!$film) {
-            return response()->json([
-                'success' => false,
-                'message' => 'film not found',
-            ], 404);    
-
-        //delete the film
-        } else {
-            $film->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'film deleted successfully',
-            ], 200);    
-    }
-        
-    }
+     // Delete film (soft delete)
+     public function destroy($id)
+     {
+         try {
+             $film = Film::findOrFail($id);
+             $film->delete(); // soft delete
+     
+             return response()->json([
+                 'success' => true,
+                 'message' => 'Film deleted (soft delete applied).'
+             ]);
+     
+         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Film not found.'
+             ], 404);
+         }
+     }
+ 
+     // Restore soft-deleted film
+     public function restore($id)
+     {
+         try {
+             $film = Film::withTrashed()->findOrFail($id);
+     
+             if ($film->trashed()) {
+                 $film->restore(); // restores it
+                 return response()->json([
+                     'success' => true,
+                     'message' => 'Film restored successfully.'
+                 ]);
+             }
+     
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Film is not deleted.'
+             ], 400);
+     
+         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Film not found.'
+             ], 404);
+         }
+     }
+ 
+     // Force delete (permanently delete)
+     public function forceDelete($id)
+     {
+         try {
+             $film = Film::withTrashed()->findOrFail($id);
+             $film->forceDelete(); // permanently delete
+     
+             return response()->json([
+                 'success' => true,
+                 'message' => 'Film permanently deleted.'
+             ]);
+     
+         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Film not found.'
+             ], 404);
+         }
+     }
 
 
     public function accepted (Film $film)

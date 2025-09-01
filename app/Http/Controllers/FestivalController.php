@@ -122,28 +122,72 @@ class FestivalController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //find the festival by id
-        $festival = Festival::find($id);
-        if (!$festival) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Festival not found',
-            ], 404);    
-
-        //delete the festival
-        } else {
-            $festival->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Festival deleted successfully',
-            ], 200);    
-    }
-}
+     // Soft delete a festival
+     public function destroy($id)
+     {
+         $festival = Festival::find($id);
+ 
+         if (!$festival) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Festival not found.'
+             ], 404);
+         }
+ 
+         $festival->delete(); // soft delete
+ 
+         return response()->json([
+             'success' => true,
+             'message' => 'Festival deleted (soft delete applied).'
+         ]);
+     }
+ 
+     // Restore a soft-deleted festival
+     public function restore($id)
+     {
+         $festival = Festival::withTrashed()->find($id);
+ 
+         if (!$festival) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Festival not found.'
+             ], 404);
+         }
+ 
+         if (!$festival->trashed()) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Festival is not deleted.'
+             ], 400);
+         }
+ 
+         $festival->restore();
+ 
+         return response()->json([
+             'success' => true,
+             'message' => 'Festival restored successfully.'
+         ]);
+     }
+ 
+     // Permanently delete a festival
+     public function forceDelete($id)
+     {
+         $festival = Festival::withTrashed()->find($id);
+ 
+         if (!$festival) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Festival not found.'
+             ], 404);
+         }
+ 
+         $festival->forceDelete(); // permanently delete
+ 
+         return response()->json([
+             'success' => true,
+             'message' => 'Festival permanently deleted.'
+         ]);
+     }
 }
 
 
